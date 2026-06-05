@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Secrets — NEVER commit these
+.env
+*.env
+
+# Tool output
+output/
+output/pocs/
+output/reports/
+
+# OS
+.DS_Store
+Thumbs.db
