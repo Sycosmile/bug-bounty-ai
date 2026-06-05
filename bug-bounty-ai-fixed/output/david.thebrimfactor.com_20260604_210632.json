@@ -1,0 +1,532 @@
+{
+  "meta": {
+    "tool": "bug-bounty-ai",
+    "target": "http://david.thebrimfactor.com",
+    "generated": "2026-06-04T21:06:32.521818",
+    "analysis_time_s": 213.35
+  },
+  "summary": {
+    "counts": {
+      "critical": 0,
+      "high": 5,
+      "medium": 6,
+      "low": 5,
+      "info": 1
+    },
+    "risk_score": 58,
+    "risk_level": "CRITICAL"
+  },
+  "attack_surface": {
+    "subdomains": [
+      "david.thebrimfactor.com"
+    ],
+    "services": [
+      "https://david.thebrimfactor.com [HTTP 200]"
+    ],
+    "endpoints": [
+      "https://david.thebrimfactor.com/wp-admin [301]",
+      "https://david.thebrimfactor.com/wp-login.php [200]",
+      "https://david.thebrimfactor.com/admin [302]",
+      "https://david.thebrimfactor.com/robots.txt [200]",
+      "https://david.thebrimfactor.com/.git/HEAD [403]"
+    ]
+  },
+  "findings": [
+    {
+      "title": "Sensitive endpoint accessible without authentication: /wp-admin",
+      "severity": "high",
+      "category": "auth",
+      "source": "api_tester",
+      "target": "https://david.thebrimfactor.com/wp-admin",
+      "description": "The endpoint returned HTTP 200 without any authentication.",
+      "remediation": "Enforce authentication and authorisation on all sensitive endpoints.",
+      "confidence": 0.75,
+      "evidence": "GET https://david.thebrimfactor.com/wp-admin \u2192 HTTP 200",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 7.35
+    },
+    {
+      "title": "Sensitive endpoint accessible without authentication: /admin",
+      "severity": "high",
+      "category": "auth",
+      "source": "api_tester",
+      "target": "https://david.thebrimfactor.com/admin",
+      "description": "The endpoint returned HTTP 200 without any authentication.",
+      "remediation": "Enforce authentication and authorisation on all sensitive endpoints.",
+      "confidence": 0.75,
+      "evidence": "GET https://david.thebrimfactor.com/admin \u2192 HTTP 200",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 7.35
+    },
+    {
+      "title": "Clickjacking vulnerability confirmed",
+      "severity": "medium",
+      "category": "web",
+      "source": "verify.clickjacking",
+      "target": "https://david.thebrimfactor.com",
+      "description": "The page can be embedded in an attacker-controlled <iframe>. Neither X-Frame-Options nor a restrictive CSP frame-ancestors directive is present. An attacker can overlay a transparent iframe over a legitimate UI to trick users into performing unintended actions.",
+      "remediation": "Add either:\n  X-Frame-Options: DENY\nor a Content-Security-Policy header with:\n  frame-ancestors 'none'\nCSP frame-ancestors is preferred as it supersedes X-Frame-Options.",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-community/attacks/Clickjacking",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html"
+      ],
+      "cvss_score": 5.4,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+      "proof": {
+        "verified": true,
+        "method": "header_analysis + body_inspection",
+        "request": "GET https://david.thebrimfactor.com",
+        "response": "GET https://david.thebrimfactor.com \u2192 HTTP 200\nX-Frame-Options: (absent)\nContent-Security-Policy frame-ancestors: upgrade-insecure-requests",
+        "has_screenshot": false
+      },
+      "verified": true,
+      "score": 5.13
+    },
+    {
+      "title": "Clickjacking vulnerability confirmed",
+      "severity": "medium",
+      "category": "web",
+      "source": "verify.clickjacking",
+      "target": "http://david.thebrimfactor.com",
+      "description": "The page can be embedded in an attacker-controlled <iframe>. Neither X-Frame-Options nor a restrictive CSP frame-ancestors directive is present. An attacker can overlay a transparent iframe over a legitimate UI to trick users into performing unintended actions.",
+      "remediation": "Add either:\n  X-Frame-Options: DENY\nor a Content-Security-Policy header with:\n  frame-ancestors 'none'\nCSP frame-ancestors is preferred as it supersedes X-Frame-Options.",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-community/attacks/Clickjacking",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html"
+      ],
+      "cvss_score": 5.4,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+      "proof": {
+        "verified": true,
+        "method": "header_analysis + body_inspection",
+        "request": "GET http://david.thebrimfactor.com",
+        "response": "GET http://david.thebrimfactor.com \u2192 HTTP 200\nX-Frame-Options: (absent)\nContent-Security-Policy frame-ancestors: upgrade-insecure-requests",
+        "has_screenshot": false
+      },
+      "verified": true,
+      "score": 5.13
+    },
+    {
+      "title": "Response body may contain plaintext passwords",
+      "severity": "high",
+      "category": "info_leak",
+      "source": "api_tester",
+      "target": "https://david.thebrimfactor.com/wp-admin",
+      "description": "Keyword 'password' found in the response body.",
+      "remediation": "Audit the endpoint response; remove sensitive data from API output.",
+      "confidence": 0.7,
+      "evidence": "Keyword 'password' present in response",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 4.41
+    },
+    {
+      "title": "Response body may contain plaintext passwords",
+      "severity": "high",
+      "category": "info_leak",
+      "source": "api_tester",
+      "target": "https://david.thebrimfactor.com/wp-login.php",
+      "description": "Keyword 'password' found in the response body.",
+      "remediation": "Audit the endpoint response; remove sensitive data from API output.",
+      "confidence": 0.7,
+      "evidence": "Keyword 'password' present in response",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 4.41
+    },
+    {
+      "title": "Response body may contain plaintext passwords",
+      "severity": "high",
+      "category": "info_leak",
+      "source": "api_tester",
+      "target": "https://david.thebrimfactor.com/admin",
+      "description": "Keyword 'password' found in the response body.",
+      "remediation": "Audit the endpoint response; remove sensitive data from API output.",
+      "confidence": 0.7,
+      "evidence": "Keyword 'password' present in response",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 4.41
+    },
+    {
+      "title": "WordPress login page exposed",
+      "severity": "medium",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://david.thebrimfactor.com/wp-login.php",
+      "description": "Exposed login page enables brute-force and credential-stuffing attacks.",
+      "remediation": "Use a login protection plugin; restrict by IP; enforce MFA.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 6726 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 3.57
+    },
+    {
+      "title": "Missing HTTP Strict Transport Security (HSTS)",
+      "severity": "medium",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "Without HSTS, browsers may downgrade HTTPS connections to HTTP, enabling SSL stripping.",
+      "remediation": "Add: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#http-strict-transport-security"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 2.85
+    },
+    {
+      "title": "Missing X-Frame-Options \u2014 clickjacking risk",
+      "severity": "medium",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "The page can be embedded in an iframe on an attacker-controlled site.",
+      "remediation": "Add: X-Frame-Options: DENY  (or use Content-Security-Policy: frame-ancestors 'none')",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#x-frame-options"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 2.85
+    },
+    {
+      "title": "Git repository exposed",
+      "severity": "medium",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://david.thebrimfactor.com/.git/HEAD",
+      "description": "The .git directory is publicly accessible; source code can be reconstructed.",
+      "remediation": "Block /.git in web server config; never deploy with .git in the web root.",
+      "confidence": 0.7,
+      "evidence": "HTTP 403, 787 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 2.73
+    },
+    {
+      "title": "Missing X-Content-Type-Options",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "Browsers may MIME-sniff responses, enabling content injection attacks.",
+      "remediation": "Add: X-Content-Type-Options: nosniff",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#x-content-type-options"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Missing Referrer-Policy",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "Full URL may be sent in the Referer header to third parties.",
+      "remediation": "Add: Referrer-Policy: strict-origin-when-cross-origin",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#referrer-policy"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Missing Permissions-Policy",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "Browser features (camera, geolocation, etc.) are not explicitly restricted.",
+      "remediation": "Add: Permissions-Policy: geolocation=(), camera=(), microphone=()",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#permissions-policy"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Web server version disclosed: LiteSpeed",
+      "severity": "low",
+      "category": "info_leak",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "The Server header reveals 'LiteSpeed', enabling targeted CVE searches.",
+      "remediation": "Configure the server to omit or genericise the Server header.",
+      "confidence": 0.95,
+      "evidence": "Server: LiteSpeed",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.855
+    },
+    {
+      "title": "Technology stack disclosed via X-Powered-By: PHP/8.2.30",
+      "severity": "low",
+      "category": "info_leak",
+      "source": "header_scan",
+      "target": "https://david.thebrimfactor.com",
+      "description": "X-Powered-By reveals 'PHP/8.2.30', narrowing attacker focus.",
+      "remediation": "Remove the X-Powered-By header (e.g. expose_php=Off in php.ini).",
+      "confidence": 0.95,
+      "evidence": "X-Powered-By: PHP/8.2.30",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.855
+    },
+    {
+      "title": "Technology identified: WordPress",
+      "severity": "info",
+      "category": "info_leak",
+      "source": "tech_fingerprint",
+      "target": "http://david.thebrimfactor.com",
+      "description": "Server is running WordPress, detectable from HTTP responses.",
+      "remediation": "Suppress version information in WordPress configuration.",
+      "confidence": 0.85,
+      "evidence": "Pattern matched in response headers/body",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.0
+    }
+  ],
+  "insights": [],
+  "execution": {
+    "skills_executed": [
+      "recon",
+      "tech_fingerprint",
+      "passive_recon",
+      "exposure",
+      "web_scan",
+      "verify",
+      "sqli_detect",
+      "api_scan",
+      "api_tester"
+    ],
+    "skills_skipped": [],
+    "errors": [],
+    "history": [
+      {
+        "skill": "recon",
+        "duration": 10.454,
+        "success": true,
+        "timestamp": "2026-06-04T21:03:09.742424"
+      },
+      {
+        "skill": "tech_fingerprint",
+        "duration": 1.981,
+        "success": true,
+        "timestamp": "2026-06-04T21:03:11.728490"
+      },
+      {
+        "skill": "passive_recon",
+        "duration": 44.713,
+        "success": true,
+        "timestamp": "2026-06-04T21:03:54.458021"
+      },
+      {
+        "skill": "exposure",
+        "duration": 57.56,
+        "success": true,
+        "timestamp": "2026-06-04T21:04:07.305910"
+      },
+      {
+        "skill": "web_scan",
+        "duration": 1.501,
+        "success": true,
+        "timestamp": "2026-06-04T21:04:08.812117"
+      },
+      {
+        "skill": "verify",
+        "duration": 4.068,
+        "success": true,
+        "timestamp": "2026-06-04T21:04:11.383794"
+      },
+      {
+        "skill": "sqli_detect",
+        "duration": 106.56,
+        "success": true,
+        "timestamp": "2026-06-04T21:05:53.873387"
+      },
+      {
+        "skill": "api_scan",
+        "duration": 24.935,
+        "success": true,
+        "timestamp": "2026-06-04T21:06:18.809351"
+      },
+      {
+        "skill": "api_tester",
+        "duration": 13.682,
+        "success": true,
+        "timestamp": "2026-06-04T21:06:32.491072"
+      }
+    ]
+  }
+}

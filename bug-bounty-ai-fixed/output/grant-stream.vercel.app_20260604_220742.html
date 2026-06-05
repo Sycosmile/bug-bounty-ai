@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bug Bounty Report — https://grant-stream.vercel.app</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+  a { color: #58a6ff; }
+
+  /* ── layout ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ── header ── */
+  header { border-bottom: 1px solid #21262d; padding-bottom: 24px; margin-bottom: 32px; }
+  header h1 { font-size: 1.6rem; color: #f0f6fc; }
+  header .sub { color: #8b949e; font-size: 0.9rem; margin-top: 4px; }
+  .target-pill { display: inline-block; background: #161b22; border: 1px solid #30363d;
+                  border-radius: 20px; padding: 4px 14px; font-family: monospace;
+                  font-size: 0.9rem; margin-top: 10px; color: #79c0ff; }
+
+  /* ── cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px; margin-bottom: 32px; }
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 10px;
+           padding: 20px 16px; text-align: center; }
+  .card .val { font-size: 2rem; font-weight: 700; color: #f0f6fc; }
+  .card .lbl { font-size: 0.78rem; color: #8b949e; margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .risk-card .val { color: #c0392b; }
+
+  /* ── gauge ── */
+  .gauge-wrap { margin-bottom: 32px; }
+  .gauge-wrap h2 { font-size: 1rem; color: #8b949e; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .06em; }
+  .gauge { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: #21262d; }
+  .gauge-segment { height: 100%; transition: width .3s; }
+  .legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #8b949e; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── section ── */
+  .section { margin-bottom: 36px; }
+  .section h2 { font-size: 1rem; color: #8b949e; text-transform: uppercase;
+                 letter-spacing: .06em; margin-bottom: 14px;
+                 padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+
+  /* ── table ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { background: #161b22; color: #8b949e; font-weight: 600; padding: 10px 12px;
+        text-align: left; border-bottom: 1px solid #21262d; white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid #161b22; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #161b22; }
+  td.num { color: #484f58; width: 36px; }
+  td.center { text-align: center; }
+  td.title-cell { max-width: 320px; word-break: break-word; color: #f0f6fc; }
+  code { background: #0d1117; border: 1px solid #21262d; border-radius: 4px;
+          padding: 2px 6px; font-size: 0.82rem; color: #79c0ff;
+          word-break: break-all; }
+
+  /* ── badges ── */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; }
+  .badge-critical { background: #3d0b0b; color: #ff7b72; border: 1px solid #c0392b; }
+  .badge-high     { background: #2d1b00; color: #ffa657; border: 1px solid #e67e22; }
+  .badge-medium   { background: #2d2200; color: #e3b341; border: 1px solid #f1c40f; }
+  .badge-low      { background: #0b2a18; color: #56d364; border: 1px solid #27ae60; }
+  .badge-info     { background: #051d38; color: #58a6ff; border: 1px solid #2980b9; }
+
+  /* ── surface lists ── */
+  .surface-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .surface-box { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 16px; }
+  .surface-box h3 { font-size: 0.82rem; color: #8b949e; text-transform: uppercase;
+                     letter-spacing: .06em; margin-bottom: 10px; }
+  .surface-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .surface-box li code { display: block; }
+
+  /* ── footer ── */
+  footer { border-top: 1px solid #21262d; padding-top: 20px; margin-top: 40px;
+            font-size: 0.8rem; color: #484f58; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>🔍 Bug Bounty Analysis Report</h1>
+    <div class="sub">Generated 2026-06-04 22:07:42</div>
+    <div class="target-pill">https://grant-stream.vercel.app</div>
+  </header>
+
+  <!-- ── summary cards ── -->
+  <div class="cards">
+    <div class="card risk-card">
+      <div class="val">CRITICAL</div>
+      <div class="lbl">Risk Level</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#f0f6fc">129</div>
+      <div class="lbl">Risk Score</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#ff7b72">6</div>
+      <div class="lbl">Critical</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#ffa657">4</div>
+      <div class="lbl">High</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#e3b341">7</div>
+      <div class="lbl">Medium</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#56d364">8</div>
+      <div class="lbl">Low</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#8b949e">8</div>
+      <div class="lbl">Skills Run</div>
+    </div>
+    <div class="card">
+      <div class="val" style="color:#8b949e">234s</div>
+      <div class="lbl">Scan Time</div>
+    </div>
+  </div>
+
+  <!-- ── gauge ── -->
+  <div class="gauge-wrap">
+    <h2>Severity Distribution</h2>
+    <div class="gauge"><div class="gauge-segment" style="width:23.1%;background:#c0392b" title="Critical: 6"></div><div class="gauge-segment" style="width:15.4%;background:#e67e22" title="High: 4"></div><div class="gauge-segment" style="width:26.9%;background:#f1c40f" title="Medium: 7"></div><div class="gauge-segment" style="width:30.8%;background:#27ae60" title="Low: 8"></div><div class="gauge-segment" style="width:3.8%;background:#2980b9" title="Info: 1"></div></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div>Critical (6)</div><div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>High (4)</div><div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div>Medium (7)</div><div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div>Low (8)</div><div class="legend-item"><div class="legend-dot" style="background:#2980b9"></div>Info (1)</div>
+    </div>
+  </div>
+
+  <!-- ── findings table ── -->
+  <div class="section">
+    <h2>Findings (26)</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Severity</th><th>Title</th><th>Target</th>
+            <th>Source</th><th>Type</th><th>Conf.</th><th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">phpMyAdmin publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/phpmyadmin</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">14.28</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">Environment file publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/.env</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">13.26</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">Backup archive publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/backup.zip</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">13.26</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">Database dump publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/db.sql</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">13.26</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">PHP config file publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/config.php</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">13.26</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td><span class="badge badge-critical">CRITICAL</span></td>
+          <td class="title-cell">Git repository exposed </td>
+          <td><code>https://grant-stream.vercel.app/.git/HEAD</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">13.26</td>
+        </tr>
+        <tr>
+          <td class="num">7</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td class="title-cell">WordPress admin panel accessible </td>
+          <td><code>https://grant-stream.vercel.app/wp-admin</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">8.33</td>
+        </tr>
+        <tr>
+          <td class="num">8</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td class="title-cell">Admin panel accessible </td>
+          <td><code>https://grant-stream.vercel.app/admin</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">8.33</td>
+        </tr>
+        <tr>
+          <td class="num">9</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td class="title-cell">Administrator panel accessible </td>
+          <td><code>https://grant-stream.vercel.app/administrator</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">8.33</td>
+        </tr>
+        <tr>
+          <td class="num">10</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td class="title-cell">Apache server-status page exposed </td>
+          <td><code>https://grant-stream.vercel.app/server-status</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">7.74</td>
+        </tr>
+        <tr>
+          <td class="num">11</td>
+          <td><span class="badge badge-medium">MEDIUM</span><br><small style='color:#8b949e'>CVSS 5.4</small></td>
+          <td class="title-cell">Clickjacking vulnerability confirmed <span class="verified-badge">✓</span></td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>verify.clickjacking</td>
+          <td class="center">95%</td>
+          <td class="center">5.13</td>
+        </tr>
+        <tr>
+          <td class="num">12</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">WordPress login page exposed </td>
+          <td><code>https://grant-stream.vercel.app/wp-login.php</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">3.57</td>
+        </tr>
+        <tr>
+          <td class="num">13</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">Metrics endpoint accessible </td>
+          <td><code>https://grant-stream.vercel.app/metrics</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">3.31</td>
+        </tr>
+        <tr>
+          <td class="num">14</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">GraphQL explorer publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/graphiql</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">3.06</td>
+        </tr>
+        <tr>
+          <td class="num">15</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">Swagger UI publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/swagger-ui.html</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">3.06</td>
+        </tr>
+        <tr>
+          <td class="num">16</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">Missing X-Frame-Options — clickjacking risk </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">2.85</td>
+        </tr>
+        <tr>
+          <td class="num">17</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td class="title-cell">Missing Content-Security-Policy </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">2.85</td>
+        </tr>
+        <tr>
+          <td class="num">18</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">Web server version disclosed: Vercel </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">1.08</td>
+        </tr>
+        <tr>
+          <td class="num">19</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">GraphQL endpoint reachable </td>
+          <td><code>https://grant-stream.vercel.app/graphql</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">1.02</td>
+        </tr>
+        <tr>
+          <td class="num">20</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">Swagger endpoint reachable </td>
+          <td><code>https://grant-stream.vercel.app/swagger</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">1.02</td>
+        </tr>
+        <tr>
+          <td class="num">21</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">OpenAPI specification publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/openapi.json</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">1.02</td>
+        </tr>
+        <tr>
+          <td class="num">22</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">API documentation publicly accessible </td>
+          <td><code>https://grant-stream.vercel.app/api-docs</code></td>
+          <td>api_scan</td>
+          <td class="center">85%</td>
+          <td class="center">1.02</td>
+        </tr>
+        <tr>
+          <td class="num">23</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">Missing X-Content-Type-Options </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">0.95</td>
+        </tr>
+        <tr>
+          <td class="num">24</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">Missing Referrer-Policy </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">0.95</td>
+        </tr>
+        <tr>
+          <td class="num">25</td>
+          <td><span class="badge badge-low">LOW</span></td>
+          <td class="title-cell">Missing Permissions-Policy </td>
+          <td><code>https://grant-stream.vercel.app</code></td>
+          <td>header_scan</td>
+          <td class="center">95%</td>
+          <td class="center">0.95</td>
+        </tr>
+        <tr>
+          <td class="num">26</td>
+          <td><span class="badge badge-info">INFO</span></td>
+          <td class="title-cell">Subdomain enumeration: 21 hosts discovered </td>
+          <td><code>grant-stream.vercel.app</code></td>
+          <td>recon</td>
+          <td class="center">90%</td>
+          <td class="center">0.00</td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── attack surface ── -->
+  <div class="section">
+    <h2>Attack Surface</h2>
+    <div class="surface-grid">
+      <div class="surface-box">
+        <h3>Subdomains (21)</h3>
+        <ul><li><code>grant-stream.vercel.app</code></li><li><code>www.grant-stream.vercel.app</code></li><li><code>mail.grant-stream.vercel.app</code></li><li><code>api.grant-stream.vercel.app</code></li><li><code>dev.grant-stream.vercel.app</code></li><li><code>staging.grant-stream.vercel.app</code></li><li><code>test.grant-stream.vercel.app</code></li><li><code>admin.grant-stream.vercel.app</code></li><li><code>blog.grant-stream.vercel.app</code></li><li><code>shop.grant-stream.vercel.app</code></li><li><code>app.grant-stream.vercel.app</code></li><li><code>portal.grant-stream.vercel.app</code></li><li><code>vpn.grant-stream.vercel.app</code></li><li><code>cdn.grant-stream.vercel.app</code></li><li><code>static.grant-stream.vercel.app</code></li><li><code>auth.grant-stream.vercel.app</code></li><li><code>login.grant-stream.vercel.app</code></li><li><code>dashboard.grant-stream.vercel.app</code></li><li><code>beta.grant-stream.vercel.app</code></li><li><code>old.grant-stream.vercel.app</code></li><li><code>backup.grant-stream.vercel.app</code></li></ul>
+      </div>
+      <div class="surface-box">
+        <h3>Services (1)</h3>
+        <ul><li><code>https://grant-stream.vercel.app [HTTP 200]</code></li></ul>
+      </div>
+      <div class="surface-box">
+        <h3>Endpoints (21)</h3>
+        <ul><li><code>https://grant-stream.vercel.app/.env [200]</code></li><li><code>https://grant-stream.vercel.app/backup.zip [200]</code></li><li><code>https://grant-stream.vercel.app/db.sql [200]</code></li><li><code>https://grant-stream.vercel.app/config.php [200]</code></li><li><code>https://grant-stream.vercel.app/graphiql [200]</code></li><li><code>https://grant-stream.vercel.app/graphql [200]</code></li><li><code>https://grant-stream.vercel.app/swagger-ui.html [200]</code></li><li><code>https://grant-stream.vercel.app/swagger [200]</code></li><li><code>https://grant-stream.vercel.app/openapi.json [200]</code></li><li><code>https://grant-stream.vercel.app/api-docs [200]</code></li><li><code>https://grant-stream.vercel.app/wp-admin [200]</code></li><li><code>https://grant-stream.vercel.app/wp-login.php [200]</code></li><li><code>https://grant-stream.vercel.app/admin [200]</code></li><li><code>https://grant-stream.vercel.app/administrator [200]</code></li><li><code>https://grant-stream.vercel.app/phpmyadmin [200]</code></li><li><code>https://grant-stream.vercel.app/robots.txt [200]</code></li><li><code>https://grant-stream.vercel.app/sitemap.xml [200]</code></li><li><code>https://grant-stream.vercel.app/server-status [200]</code></li><li><code>https://grant-stream.vercel.app/.git/HEAD [200]</code></li><li><code>https://grant-stream.vercel.app/health [200]</code></li><li><code>https://grant-stream.vercel.app/metrics [200]</code></li></ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>Generated by bug-bounty-ai &nbsp;·&nbsp; 2026-06-04 22:07:42</footer>
+
+</div>
+</body>
+</html>

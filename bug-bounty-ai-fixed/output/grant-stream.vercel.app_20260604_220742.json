@@ -1,0 +1,774 @@
+{
+  "meta": {
+    "tool": "bug-bounty-ai",
+    "target": "https://grant-stream.vercel.app",
+    "generated": "2026-06-04T22:07:42.246389",
+    "analysis_time_s": 233.6
+  },
+  "summary": {
+    "counts": {
+      "critical": 6,
+      "high": 4,
+      "medium": 7,
+      "low": 8,
+      "info": 1
+    },
+    "risk_score": 129,
+    "risk_level": "CRITICAL"
+  },
+  "attack_surface": {
+    "subdomains": [
+      "grant-stream.vercel.app",
+      "www.grant-stream.vercel.app",
+      "mail.grant-stream.vercel.app",
+      "api.grant-stream.vercel.app",
+      "dev.grant-stream.vercel.app",
+      "staging.grant-stream.vercel.app",
+      "test.grant-stream.vercel.app",
+      "admin.grant-stream.vercel.app",
+      "blog.grant-stream.vercel.app",
+      "shop.grant-stream.vercel.app",
+      "app.grant-stream.vercel.app",
+      "portal.grant-stream.vercel.app",
+      "vpn.grant-stream.vercel.app",
+      "cdn.grant-stream.vercel.app",
+      "static.grant-stream.vercel.app",
+      "auth.grant-stream.vercel.app",
+      "login.grant-stream.vercel.app",
+      "dashboard.grant-stream.vercel.app",
+      "beta.grant-stream.vercel.app",
+      "old.grant-stream.vercel.app",
+      "backup.grant-stream.vercel.app"
+    ],
+    "services": [
+      "https://grant-stream.vercel.app [HTTP 200]"
+    ],
+    "endpoints": [
+      "https://grant-stream.vercel.app/.env [200]",
+      "https://grant-stream.vercel.app/backup.zip [200]",
+      "https://grant-stream.vercel.app/db.sql [200]",
+      "https://grant-stream.vercel.app/config.php [200]",
+      "https://grant-stream.vercel.app/graphiql [200]",
+      "https://grant-stream.vercel.app/graphql [200]",
+      "https://grant-stream.vercel.app/swagger-ui.html [200]",
+      "https://grant-stream.vercel.app/swagger [200]",
+      "https://grant-stream.vercel.app/openapi.json [200]",
+      "https://grant-stream.vercel.app/api-docs [200]",
+      "https://grant-stream.vercel.app/wp-admin [200]",
+      "https://grant-stream.vercel.app/wp-login.php [200]",
+      "https://grant-stream.vercel.app/admin [200]",
+      "https://grant-stream.vercel.app/administrator [200]",
+      "https://grant-stream.vercel.app/phpmyadmin [200]",
+      "https://grant-stream.vercel.app/robots.txt [200]",
+      "https://grant-stream.vercel.app/sitemap.xml [200]",
+      "https://grant-stream.vercel.app/server-status [200]",
+      "https://grant-stream.vercel.app/.git/HEAD [200]",
+      "https://grant-stream.vercel.app/health [200]",
+      "https://grant-stream.vercel.app/metrics [200]"
+    ]
+  },
+  "findings": [
+    {
+      "title": "phpMyAdmin publicly accessible",
+      "severity": "critical",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/phpmyadmin",
+      "description": "phpMyAdmin exposes full database management to the internet.",
+      "remediation": "Remove phpMyAdmin from the web root or restrict to localhost only.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 14.28
+    },
+    {
+      "title": "Environment file publicly accessible",
+      "severity": "critical",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/.env",
+      "description": ".env files contain credentials, API keys, and database URLs.",
+      "remediation": "Block access to .env via web server config; never commit .env to the repo.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 13.26
+    },
+    {
+      "title": "Backup archive publicly accessible",
+      "severity": "critical",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/backup.zip",
+      "description": "Backup archives may contain source code, credentials, and database dumps.",
+      "remediation": "Remove backup files from the web root; use off-site backup storage.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 13.26
+    },
+    {
+      "title": "Database dump publicly accessible",
+      "severity": "critical",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/db.sql",
+      "description": "SQL dumps expose the entire database schema and potentially PII/credentials.",
+      "remediation": "Remove database dumps from the web root immediately.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 13.26
+    },
+    {
+      "title": "PHP config file publicly accessible",
+      "severity": "critical",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/config.php",
+      "description": "Config files may contain database credentials and secret keys.",
+      "remediation": "Move config files outside the web root or block via web server rules.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 13.26
+    },
+    {
+      "title": "Git repository exposed",
+      "severity": "critical",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/.git/HEAD",
+      "description": "The .git directory is publicly accessible; source code can be reconstructed.",
+      "remediation": "Block /.git in web server config; never deploy with .git in the web root.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 13.26
+    },
+    {
+      "title": "WordPress admin panel accessible",
+      "severity": "high",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/wp-admin",
+      "description": "The WordPress admin panel is reachable from the internet.",
+      "remediation": "Restrict /wp-admin by IP address or implement two-factor authentication.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 8.33
+    },
+    {
+      "title": "Admin panel accessible",
+      "severity": "high",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/admin",
+      "description": "An admin interface is reachable from the internet.",
+      "remediation": "Restrict admin interfaces to internal networks or VPN.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 8.33
+    },
+    {
+      "title": "Administrator panel accessible",
+      "severity": "high",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/administrator",
+      "description": "An administrator interface is reachable from the internet.",
+      "remediation": "Restrict to VPN or internal networks; enforce MFA.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 8.33
+    },
+    {
+      "title": "Apache server-status page exposed",
+      "severity": "high",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/server-status",
+      "description": "Exposes real-time request data, internal IPs, and worker state.",
+      "remediation": "Restrict mod_status to localhost: Allow from 127.0.0.1",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 7.735
+    },
+    {
+      "title": "Clickjacking vulnerability confirmed",
+      "severity": "medium",
+      "category": "web",
+      "source": "verify.clickjacking",
+      "target": "https://grant-stream.vercel.app",
+      "description": "The page can be embedded in an attacker-controlled <iframe>. Neither X-Frame-Options nor a restrictive CSP frame-ancestors directive is present. An attacker can overlay a transparent iframe over a legitimate UI to trick users into performing unintended actions.",
+      "remediation": "Add either:\n  X-Frame-Options: DENY\nor a Content-Security-Policy header with:\n  frame-ancestors 'none'\nCSP frame-ancestors is preferred as it supersedes X-Frame-Options.",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-community/attacks/Clickjacking",
+        "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html"
+      ],
+      "cvss_score": 5.4,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+      "proof": {
+        "verified": true,
+        "method": "header_analysis + body_inspection",
+        "request": "GET https://grant-stream.vercel.app",
+        "response": "GET https://grant-stream.vercel.app \u2192 HTTP 200\nX-Frame-Options: (absent)\nContent-Security-Policy frame-ancestors: (absent)",
+        "has_screenshot": false
+      },
+      "verified": true,
+      "score": 5.13
+    },
+    {
+      "title": "WordPress login page exposed",
+      "severity": "medium",
+      "category": "auth",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/wp-login.php",
+      "description": "Exposed login page enables brute-force and credential-stuffing attacks.",
+      "remediation": "Use a login protection plugin; restrict by IP; enforce MFA.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 3.57
+    },
+    {
+      "title": "Metrics endpoint accessible",
+      "severity": "medium",
+      "category": "misconfigured",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/metrics",
+      "description": "Prometheus/metrics endpoints expose internal performance and configuration data.",
+      "remediation": "Restrict metrics endpoint to internal networks or monitoring systems.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 3.315
+    },
+    {
+      "title": "GraphQL explorer publicly accessible",
+      "severity": "medium",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/graphiql",
+      "description": "GraphiQL lets anyone introspect the schema and craft arbitrary queries.",
+      "remediation": "Disable GraphiQL in production or restrict to authenticated users.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 3.06
+    },
+    {
+      "title": "Swagger UI publicly accessible",
+      "severity": "medium",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/swagger-ui.html",
+      "description": "Swagger UI exposes full API documentation including auth requirements.",
+      "remediation": "Restrict Swagger UI to internal networks or authenticated sessions.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 3.06
+    },
+    {
+      "title": "Missing X-Frame-Options \u2014 clickjacking risk",
+      "severity": "medium",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "The page can be embedded in an iframe on an attacker-controlled site.",
+      "remediation": "Add: X-Frame-Options: DENY  (or use Content-Security-Policy: frame-ancestors 'none')",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#x-frame-options"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 2.85
+    },
+    {
+      "title": "Missing Content-Security-Policy",
+      "severity": "medium",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "No CSP means XSS payloads can load arbitrary scripts from any origin.",
+      "remediation": "Define a strict CSP; at minimum: Content-Security-Policy: default-src 'self'",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#content-security-policy"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 2.85
+    },
+    {
+      "title": "Web server version disclosed: Vercel",
+      "severity": "low",
+      "category": "info_leak",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "The Server header reveals 'Vercel', enabling targeted CVE searches.",
+      "remediation": "Configure the server to omit or genericise the Server header.",
+      "confidence": 0.95,
+      "evidence": "Server: Vercel",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 1.083
+    },
+    {
+      "title": "GraphQL endpoint reachable",
+      "severity": "low",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/graphql",
+      "description": "GraphQL endpoint is publicly reachable; introspection may be enabled.",
+      "remediation": "Disable introspection in production; apply query depth/complexity limits.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 1.02
+    },
+    {
+      "title": "Swagger endpoint reachable",
+      "severity": "low",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/swagger",
+      "description": "Swagger/OpenAPI spec is publicly available.",
+      "remediation": "Restrict API docs to authenticated users in production.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 1.02
+    },
+    {
+      "title": "OpenAPI specification publicly accessible",
+      "severity": "low",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/openapi.json",
+      "description": "Full API schema is exposed, aiding targeted attack planning.",
+      "remediation": "Restrict access to the OpenAPI spec in production environments.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 1.02
+    },
+    {
+      "title": "API documentation publicly accessible",
+      "severity": "low",
+      "category": "api",
+      "source": "api_scan",
+      "target": "https://grant-stream.vercel.app/api-docs",
+      "description": "API documentation is publicly reachable.",
+      "remediation": "Restrict to authenticated sessions or internal networks.",
+      "confidence": 0.85,
+      "evidence": "HTTP 200, 67807 bytes",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 1.02
+    },
+    {
+      "title": "Missing X-Content-Type-Options",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "Browsers may MIME-sniff responses, enabling content injection attacks.",
+      "remediation": "Add: X-Content-Type-Options: nosniff",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#x-content-type-options"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Missing Referrer-Policy",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "Full URL may be sent in the Referer header to third parties.",
+      "remediation": "Add: Referrer-Policy: strict-origin-when-cross-origin",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#referrer-policy"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Missing Permissions-Policy",
+      "severity": "low",
+      "category": "web",
+      "source": "header_scan",
+      "target": "https://grant-stream.vercel.app",
+      "description": "Browser features (camera, geolocation, etc.) are not explicitly restricted.",
+      "remediation": "Add: Permissions-Policy: geolocation=(), camera=(), microphone=()",
+      "confidence": 0.95,
+      "evidence": "",
+      "cve": null,
+      "references": [
+        "https://owasp.org/www-project-secure-headers/#permissions-policy"
+      ],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.95
+    },
+    {
+      "title": "Subdomain enumeration: 21 hosts discovered",
+      "severity": "info",
+      "category": "recon",
+      "source": "recon",
+      "target": "grant-stream.vercel.app",
+      "description": "Discovered hosts: grant-stream.vercel.app, www.grant-stream.vercel.app, mail.grant-stream.vercel.app, api.grant-stream.vercel.app, dev.grant-stream.vercel.app, staging.grant-stream.vercel.app, test.grant-stream.vercel.app, admin.grant-stream.vercel.app, blog.grant-stream.vercel.app, shop.grant-stream.vercel.app",
+      "remediation": "",
+      "confidence": 0.9,
+      "evidence": "",
+      "cve": null,
+      "references": [],
+      "cvss_score": null,
+      "cvss_vector": null,
+      "proof": {
+        "verified": false,
+        "method": "",
+        "request": "",
+        "response": "",
+        "has_screenshot": false
+      },
+      "verified": false,
+      "score": 0.0
+    }
+  ],
+  "insights": [],
+  "execution": {
+    "skills_executed": [
+      "recon",
+      "tech_fingerprint",
+      "passive_recon",
+      "exposure",
+      "web_scan",
+      "verify",
+      "sqli_detect",
+      "api_scan"
+    ],
+    "skills_skipped": [],
+    "errors": [],
+    "history": [
+      {
+        "skill": "recon",
+        "duration": 5.672,
+        "success": true,
+        "timestamp": "2026-06-04T22:03:54.391273"
+      },
+      {
+        "skill": "tech_fingerprint",
+        "duration": 1.462,
+        "success": true,
+        "timestamp": "2026-06-04T22:03:55.863563"
+      },
+      {
+        "skill": "passive_recon",
+        "duration": 33.927,
+        "success": true,
+        "timestamp": "2026-06-04T22:04:28.325038"
+      },
+      {
+        "skill": "exposure",
+        "duration": 150.501,
+        "success": true,
+        "timestamp": "2026-06-04T22:06:24.900984"
+      },
+      {
+        "skill": "web_scan",
+        "duration": 0.59,
+        "success": true,
+        "timestamp": "2026-06-04T22:06:25.493852"
+      },
+      {
+        "skill": "verify",
+        "duration": 25.987,
+        "success": true,
+        "timestamp": "2026-06-04T22:06:50.891709"
+      },
+      {
+        "skill": "sqli_detect",
+        "duration": 62.414,
+        "success": true,
+        "timestamp": "2026-06-04T22:07:27.318326"
+      },
+      {
+        "skill": "api_scan",
+        "duration": 14.894,
+        "success": true,
+        "timestamp": "2026-06-04T22:07:42.213485"
+      }
+    ]
+  }
+}
