@@ -16,7 +16,7 @@
 
 ---
 
-## 🤔 Why Not Just Use Nuclei or Burp?
+## 🤔 Why Not Just Use Nuclei or Burp? 
 
 Most tools give you **raw output** — you still have to manually decide what to run, in what order, and what findings actually matter. Bug-Bounty-AI is different:
 
